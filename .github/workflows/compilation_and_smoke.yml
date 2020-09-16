@@ -1,5 +1,5 @@
 ---
-name: Lotti-Karotti-Calculator acceptance
+name: Lotti-Karotti-Calc acceptance
 
 env:
   RESULT_FILE: result.txt
