@@ -1,3 +1,4 @@
+---
 # Configuration file for Lotti-Karotti
 
 # number of rabbits (e.g. attempts to win) for every player
@@ -22,11 +23,11 @@ playfield:
 # defines the stack with player actions
 stack:
   # Template for definition of the cards in the stack
-  # The name of the card is not used anywhere, used just for a readability of this config
+  # The name of the card is not used anywhere, added for a readability
   # <the name of the card>:
     # how many cells on the play field the rabbit jumps. Default: 0-3
     # move: 0
-    # shifts the positions of the holes on a play field by this number. Default: 1
+    # shifts the positions of the holes on a play field by this number.
     # rotate: 1
     # how many cards of this type are in stack
     # qtty: 12

@@ -35,14 +35,14 @@ class GameRunner:
 
     def run_games(self) -> None:
         while self._current_game_number <= self._number_of_games:
-            print(f'######################## GAME #{self._current_game_number} ########################')
+            print(f'##################### GAME #{self._current_game_number} #####################')
             winner_id = self._game_engine.run_game()
             if not winner_id:
                 key = 'draw'
-                print(f'===================== {key.upper()} GAME!!! =====================')
+                print(f'================== {key.upper()} GAME!!! ==================')
             else:
                 key = str(winner_id)
-                print(f'================== PLAYER #{key} WINS THE GAME!!! ==================')
+                print(f'=============== PLAYER #{key} WINS THE GAME!!! ===============')
             if key in self._game_stats:
                 self._game_stats[key] += 1
             else:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import yaml
 import sys
 from pathlib import Path
+import yaml
 
 
 class Config:
@@ -11,7 +11,7 @@ class Config:
     def __init__(self, path):
         with open(path, 'r') as f:
             contents = f.read()
-            self.options = yaml.load(contents, Loader=yaml.FullLoader)
+            self.options = yaml.safe_load(contents)
 
 
 path_to_config = Path(__file__).parent.parent.joinpath('config', 'lotti_config.yaml')
