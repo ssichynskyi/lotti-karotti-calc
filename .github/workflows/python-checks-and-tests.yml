@@ -47,5 +47,3 @@ jobs:
           coverage run --source=/home/runner/work/lotti-karotti-calc/lotti-karotti-calc -m pytest tests/
           coverage report
           coveralls
-      - name: Coveralls-Python GitHub Action
-        uses: AndreMiras/coveralls-python-action@develop
