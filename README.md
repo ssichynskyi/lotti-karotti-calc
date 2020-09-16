@@ -1,4 +1,4 @@
-![](https://github.com/ssichynskyi/lotti-karotti-calculator/workflows/Lotti-Karotti-Calc%20acceptance/badge.svg)
+![](https://github.com/ssichynskyi/lotti-karotti-calc/workflows/Lotti-Karotti-Calc%20acceptance/badge.svg)
 [![Code Grade](https://www.code-inspector.com/project/13601/score/svg)](https://www.code-inspector.com)
 [![Code Grade](https://www.code-inspector.com/project/13601/status/svg)](https://www.code-inspector.com)
 [![Coverage Status](https://coveralls.io/repos/github/ssichynskyi/lotti-karotti-calc/badge.svg?branch=master)](https://coveralls.io/github/ssichynskyi/lotti-karotti-calc?branch=master)
