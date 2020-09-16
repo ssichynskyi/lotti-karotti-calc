@@ -1,0 +1,89 @@
+#!/usr/bin/groovy
+
+// in order to be used in a declarative pipeline, the variable has to be declared here
+int i
+
+pipeline {
+    agent none
+    stages {
+        stage('Prepare') {
+            agent {
+                docker {
+                    image 'lotti-building-image'
+                    args '-u root'
+                    // running container as a root user is necessary for the container to create files
+                }
+            }
+            steps {
+                sh 'rm -d -R lotti-karotti-calculator/ --force'
+                // execute actions in {} inside specified folder /home/ automatically creates dir by path
+                // if it's absent
+                dir (path: 'lotti-karotti-calculator/') {
+                    git credentialsId: 'fbc371f1-01f1-4edc-be62-fd9545b3a263',
+                        url: 'https://github.com/ssichynskyi/lotti-karotti-calculator.git'
+                }
+                sh 'chmod -R 777 lotti-karotti-calculator/'
+            }
+        }
+        stage('Compile') {
+            agent {
+                docker {
+                    image 'lotti-building-image'
+                    args '-u root'
+                }
+            }
+            steps {
+                echo 'Compiling'
+                dir (path: 'workfolder/') {
+                    sh 'touch emptyfile'
+                }
+                sh 'chmod -R 777 workfolder/'
+                dir (path: 'artifacts/') {
+                    sh 'touch game'
+                }
+                sh 'chmod -R 777 artifacts/'
+                sh '''linux/common/build.sh \
+                    SOURCE-FOLDER=$WORKSPACE/lotti-karotti-calculator/ \
+                    SCRIPT=game.py \
+                    DEST-FOLDER=$WORKSPACE/artifacts/ \
+                    WORK-FOLDER=$WORKSPACE/workfolder/'''
+                echo "COMPILATION FULLY FINISHED....................................."
+            }
+        }
+
+        stage('Smoke Test') {
+            agent {
+                docker {
+                    image 'lotti-running-image'
+                    args '-u root'
+                }
+            }
+            steps {
+                echo 'Running smoke tests'
+                dir (path: 'artifacts/') {
+                    script {
+                        for (i = 2; i <= 4; i++)
+                        {
+                            sh "bash -c \" ./run_for_${i}.sh\""
+                        }
+                        sh './game 5'
+                        sh 'test -f result.txt'
+                        sh 'rm result.txt --force'
+                    }
+                }
+                //archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Compiled and tested successfully'
+        }
+        failure {
+            echo 'Comilation / smoke test failed'
+        }
+        changed {
+            echo 'The status of the pipeline has changed'
+        }
+    }
+}

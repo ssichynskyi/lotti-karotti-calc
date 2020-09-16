@@ -1,0 +1,52 @@
+#!/usr/bin/groovy
+
+// in order to be used in a declarative pipeline, the variable has to be declared here
+String var
+
+pipeline {
+    agent {
+        docker {
+            image 'lotti-building-image'
+            args '-u root'
+            // running container as a root user is necessary for the container to create files
+        }
+    }
+    stages {
+        stage('Prepare') {
+            steps {
+                sh 'rm -d -R lotti-karotti-calculator/ --force'
+                // execute actions in {} inside specified folder /home/ automatically creates dir by path
+                // if it's absent
+                dir (path: 'lotti-karotti-calculator/') {
+                    git credentialsId: 'fbc371f1-01f1-4edc-be62-fd9545b3a263',
+                        url: 'https://github.com/ssichynskyi/lotti-karotti-calculator.git'
+                }
+                sh 'chmod -R 777 lotti-karotti-calculator/'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'touch unit-test-log.txt'
+                sh 'chmod 666 unit-test-log.txt'
+                sh 'pytest lotti-karotti-calculator/tests/ > unit-test-log.txt'
+                script {
+                    var = new File("${env.WORKSPACE}" + '/unit-test-log.txt').text
+                    if (var.contains('FAILURE')) {
+                        error 'Program failed, please read logs...'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Unittests run successfully'
+        }
+        failure {
+            echo 'Unittests failed'
+        }
+        changed {
+            echo 'The status of the pipeline has changed'
+        }
+    }
+}

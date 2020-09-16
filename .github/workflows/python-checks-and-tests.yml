@@ -1,0 +1,48 @@
+---
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Python checks and tests
+
+on: ["push"]
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+      - name: Syntax error check with flake8 -
+        run: |
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Static Code analysis by Code Inspector
+        uses: codeinspectorio/github-action@v1
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          code_inspector_access_key: ${{ secrets.CODE_INSPECTOR_ACCESS_KEY }}
+          code_inspector_secret_key: ${{ secrets.CODE_INSPECTOR_SECRET_KEY }}
+          min_quality_grade: 'NEUTRAL'
+          min_quality_score: '70'
+          max_defects_rate: '0.05'
+          max_complex_functions_rate: '0.1'
+          max_long_functions_rate: '0.1'
+          project_name: 'lotti-karotti-calculator'
+          max_timeout_sec: '600'
+      - name: Run unit tests
+        run: |
+          pip install coverage
+          coverage run -m pytest tests/
+          coverage report
+      - name: Coveralls-Python GitHub Action
+        uses: AndreMiras/coveralls-python-action@develop

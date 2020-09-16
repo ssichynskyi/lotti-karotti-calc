@@ -1,0 +1,49 @@
+---
+# Configuration file for Lotti-Karotti
+
+# number of rabbits (e.g. attempts to win) for every player
+rabbits_per_player: 4
+
+# defines the configuration of a play field
+playfield:
+  # total number of valid play fields, excluding 0-field
+  # which is an initial location for all rabbits
+  number_of_cells: 27
+  # number of cells on the play field that could turn into holes
+  # sequence of switching is also set by this array
+  # the number that exceeds the cell number, represents
+  # the situation when there are no empty holes.
+  # if there's a need to have more than 1 empty holes, just add
+  # required amount of numbers exceeding cell number
+  holes: [28, 13, 25, 16, 23, 4, 21, 7, 19, 10]
+  # holes are shifted by this number of positions. Default = 1.
+  # consider values 1 or -1
+  shift: 1
+
+# defines the stack with player actions
+stack:
+  # Template for definition of the cards in the stack
+  # The name of the card is not used anywhere, used just for a readability of this config
+  # <the name of the card>:
+    # how many cells on the play field the rabbit jumps. Default: 0-3
+    # move: 0
+    # shifts the positions of the holes on a play field by this number. Default: 1
+    # rotate: 1
+    # how many cards of this type are in stack
+    # qtty: 12
+  click:
+    move: 0
+    rotate: 1
+    qtty: 12
+  move_1:
+    move: 1
+    rotate: 0
+    qtty: 24
+  move_2:
+    move: 2
+    rotate: 0
+    qtty: 8
+  move_3:
+    move: 3
+    rotate: 0
+    qtty: 4

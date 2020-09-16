@@ -1,0 +1,6 @@
+FROM rackspacedot/python37:latest
+RUN pip3 install pytest
+RUN pip3 install pyinstaller
+RUN apt install git -y
+#expect exec command to run unit tests
+#expect an exec command to compile if unit test runs ok

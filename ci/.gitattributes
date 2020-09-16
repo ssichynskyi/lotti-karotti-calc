@@ -1,0 +1,12 @@
+###############################################################################
+# General rule to automatically normalize line endings.
+###############################################################################
+* text=auto
+
+# List types of files which line endings shall always be windows-like (CRLF)
+# -------------------------------------
+*.ps1 text eol=crlf
+
+# List types of files which line endings shall always be linux-like (LF)
+# -------------------------------------
+*.sh text eol=lf

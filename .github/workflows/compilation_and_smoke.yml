@@ -1,0 +1,210 @@
+---
+name: Lotti-Karotti-Calculator acceptance
+
+env:
+  RESULT_FILE: result.txt
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  build:
+    timeout-minutes: 5
+    env:
+      DEST_FOLDER: artifacts/${{ matrix.os }}/${{ matrix.python-version }}/
+      WORK_FOLDER: workfolder/${{ matrix.os }}/${{ matrix.python-version }}/
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: [3.8]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Show Python version
+        run: |
+          echo "Compiling and testing under python version:"
+          python --version
+      - name: Install other common dependencies...
+        run: pip install pyinstaller
+      - name: Install other dependencies
+        run: pip install -r requirements.txt
+      - name: Prepare folder structure for Linux
+        if: ${{ contains(matrix.os, 'ubuntu') }}
+        run: mkdir -p $DEST_FOLDER $WORK_FOLDER
+      - name: Prepare folder structure for Windows
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          New-Item -Path ${env:DEST_FOLDER} -ItemType "directory" -force
+          New-Item -Path ${env:WORK_FOLDER} -ItemType "directory" -force
+        shell: pwsh
+      - name: Compile under linux...
+        if: ${{ contains(matrix.os, 'ubuntu') }}
+        run: |
+          pyinstaller \
+            --noconfirm \
+            --onefile \
+            --nowindow \
+            --clean \
+            --workpath $WORK_FOLDER \
+            --distpath $DEST_FOLDER \
+            --specpath $DEST_FOLDER \
+            game.py
+      - name: Compile under windows...
+        if: ${{ contains(matrix.os, 'windows') }}
+        run: |
+          pyinstaller `
+            --noconfirm `
+            --onefile `
+            --nowindow `
+            --clean `
+            --workpath ${env:WORK_FOLDER} `
+            --distpath ${env:DEST_FOLDER} `
+            --specpath ${env:DEST_FOLDER} `
+            game.py
+      - name: Upload compilation data on FAILURE
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: compilation-traces
+          path: ${{ env.WORK_FOLDER }}
+      - name: Packaging for Linux
+        if: ${{ contains(matrix.os, 'ubuntu') }}
+        working-directory: ${{ env.DEST_FOLDER }}
+        run: |
+          cp ../../../config/ ./ -r -f
+          echo "create script files for the fast run"
+          for i in {2..4}
+          do
+            cp ../../../prepacks/run_script_sample.sh run_for_"${i}".sh
+            echo "${i} \\" >> run_for_"${i}".sh
+            echo 1000 >> run_for_"${i}".sh
+          done
+      - name: Packaging for Windows
+        if: ${{ contains(matrix.os, 'windows') }}
+        working-directory: ${{ env.DEST_FOLDER }}
+        run: |
+          "Copying config files......"
+          Copy-Item -Path "..\..\..\config\" -Destination ".\" -Recurse
+          "Creating batch files......."
+          foreach ($i in @(2, 3, 4))
+          {
+            "game.exe $i 1000&PAUSE" | Out-File -FilePath "run-game-for-$i.bat" -Encoding ascii
+          }
+          dir
+        shell: pwsh
+      - name: Save product artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: product-${{ matrix.os }}-${{ matrix.python-version }}
+          path: ${{ env.DEST_FOLDER }}
+
+  smoke-test-linux:
+    timeout-minutes: 3
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        python-version: [3.8]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: product-${{ matrix.os }}-${{ matrix.python-version }}
+          path: artifacts/${{ matrix.os }}/${{ matrix.python-version }}
+      - name: Run smoke test
+        working-directory: artifacts/${{ matrix.os }}/${{ matrix.python-version }}
+        run: |
+          chmod +x game
+          for i in {2..4}
+          do
+            chmod +x run_for_"${i}".sh
+            echo "running smoke test for "${i}" players..."
+            ./run_for_"${i}".sh
+            if !(test -f $RESULT_FILE)
+            then
+                echo Error: file $RESULT_FILE does not exist
+                exit 119
+            fi
+            echo file $RESULT_FILE exists
+            echo "Smoke test successful"
+            rm $RESULT_FILE --force
+          done
+      # save only the last artifact since if they pass, they are identical
+      - name: Save product artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-build
+          path: artifacts/${{ matrix.os }}/${{ matrix.python-version }}
+
+  smoke-test-windows:
+    timeout-minutes: 3
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest]
+        python-version: [3.8]
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: product-${{ matrix.os }}-${{ matrix.python-version }}
+          path: artifacts/${{ matrix.os }}/${{ matrix.python-version }}
+      - name: Run smoke test
+        working-directory: artifacts/${{ matrix.os }}/${{ matrix.python-version }}
+        run: |
+          foreach ($i in @(2, 3, 4))
+          {
+            "running smoke test for $i players..."
+            Invoke-Expression ".\run-game-for-$i.bat"
+            if (-Not (test-path ${env:RESULT_FILE} -PathType Leaf)) {
+              throw "${env:RESULT_FILE} was not created. Terminating..."
+            }
+            "file ${env:RESULT_FILE} exists"
+            "Smoke test successful"
+            Remove-Item ${env:RESULT_FILE} -Force
+          }
+        shell: pwsh
+      # save only the last artifact since if they pass, they are identical
+      - name: Save product artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-build
+          path: artifacts/${{ matrix.os }}/${{ matrix.python-version }}
+
+  compress-and-upload:
+    timeout-minutes: 2
+    needs: [smoke-test-linux]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        targetOS: [linux, windows]
+    steps:
+      - name: download ${{ matrix.targetOS }} artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ matrix.targetOS }}-build
+          path: ${{ matrix.targetOS }}/
+      - name: Compress linux artifacts
+        uses: DuckSoft/create-7z-action@v1.0
+        with:
+          pathSource: ${{ matrix.targetOS }}/*
+          pathTarget: ${{ matrix.targetOS }}/7z/lotti-karotti-calculator-${{ matrix.targetOS }}.7z
+      - name: Upload to Amazon S3
+        uses: tpaschalis/s3-sync-action@master
+        env:
+          FILE: ${{ matrix.targetOS }}/7z/lotti-karotti-calculator-${{ matrix.targetOS }}.7z
+          AWS_REGION: 'eu-central-1'
+          AWS_S3_BUCKET: ${{ secrets.AMAZON_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AMAZON_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AMAZON_ACCESS_KEY }}
+      - name: Report the status
+        run: |
+          echo "Artifacts has been uploaded"

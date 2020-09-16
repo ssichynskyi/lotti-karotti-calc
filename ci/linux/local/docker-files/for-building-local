@@ -1,0 +1,9 @@
+FROM rackspacedot/python37:latest
+RUN mkdir /home/lotti-karotti-calculator/
+RUN mkdir /home/cicd/
+RUN mkdir /home/artifacts/
+RUN mkdir /home/workfolder/
+RUN pip3 install pytest
+RUN pip3 install pyinstaller
+#expect exec command to run unit tests
+#expect an exec command to compile if unit test runs ok
