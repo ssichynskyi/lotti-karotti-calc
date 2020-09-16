@@ -39,7 +39,7 @@ jobs:
           max_defects_rate: '0.05'
           max_complex_functions_rate: '0.1'
           max_long_functions_rate: '0.1'
-          project_name: 'lotti-karotti-calculator'
+          project_name: 'lotti-karotti-calc'
           max_timeout_sec: '600'
       - name: Run unit tests
         run: |
