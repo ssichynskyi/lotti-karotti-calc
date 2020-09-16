@@ -41,7 +41,7 @@ jobs:
           max_timeout_sec: '600'
       - name: Run unit tests
         run: |
-          pip install coverage
+          pip install coverage==5.0.3
           coverage run -m pytest tests/
           coverage report
       - name: Coveralls-Python GitHub Action
