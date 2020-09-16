@@ -1,6 +1,7 @@
-![](https://github.com/ssichynskyi/lotti-karotti-calculator/workflows/Lotti-Karotti-Calculator%20acceptance/badge.svg)
-[![Code Grade](https://www.code-inspector.com/project/8769/score/svg)](https://www.code-inspector.com) [![Code Grade](https://www.code-inspector.com/project/8769/status/svg)](https://www.code-inspector.com)
-[![Coverage Status](https://coveralls.io/repos/github/ssichynskyi/lotti-karotti-calculator/badge.svg?branch=master)](https://coveralls.io/github/ssichynskyi/lotti-karotti-calculator?branch=master)
+![](https://github.com/ssichynskyi/lotti-karotti-calc/workflows/Lotti-Karotti-Calc%20acceptance/badge.svg)
+[![Code Grade](https://www.code-inspector.com/project/13601/score/svg)](https://www.code-inspector.com)
+[![Code Grade](https://www.code-inspector.com/project/13601/status/svg)](https://www.code-inspector.com)
+[![Coverage Status](https://coveralls.io/repos/github/ssichynskyi/lotti-karotti-calc/badge.svg?branch=master)](https://coveralls.io/github/ssichynskyi/lotti-karotti-calc?branch=master)
 ## Calculator of winning odds in the game Lotti Karotti
 This program calculates the winning odds for a certain player
 in the game [Lotti Karotti](https://de.wikipedia.org/wiki/Lotti_Karotti)

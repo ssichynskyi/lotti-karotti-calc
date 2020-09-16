@@ -8,6 +8,8 @@ on: ["push"]
 jobs:
   test:
     timeout-minutes: 10
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -37,12 +39,11 @@ jobs:
           max_defects_rate: '0.05'
           max_complex_functions_rate: '0.1'
           max_long_functions_rate: '0.1'
-          project_name: 'lotti-karotti-calculator'
+          project_name: 'lotti-karotti-calc'
           max_timeout_sec: '600'
       - name: Run unit tests
         run: |
-          pip install coverage
-          coverage run -m pytest tests/
+          pip install coverage coveralls
+          coverage run --source=/home/runner/work/lotti-karotti-calc/lotti-karotti-calc -m pytest tests/
           coverage report
-      - name: Coveralls-Python GitHub Action
-        uses: AndreMiras/coveralls-python-action@develop
+          coveralls
