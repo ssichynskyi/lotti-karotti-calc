@@ -2,7 +2,10 @@
 [![Code Grade](https://www.code-inspector.com/project/13601/score/svg?service=github)](https://www.code-inspector.com)
 [![Code Grade](https://www.code-inspector.com/project/13601/status/svg?service=github)](https://www.code-inspector.com)
 [![Coverage Status](https://coveralls.io/repos/github/ssichynskyi/lotti-karotti-calc/badge.svg?branch=master&service=github)](https://coveralls.io/github/ssichynskyi/lotti-karotti-calc?branch=master)
+
 ## Calculator of winning odds in the game Lotti Karotti
+(!) Don't take this project seriously. It was made just for fun and mostly to try things like python "compilation" and trying on GitHub actions and some other things which I haven't touched for some time.
+
 This program calculates the winning odds for a certain player
 in the game [Lotti Karotti](https://de.wikipedia.org/wiki/Lotti_Karotti)
 This program answers the question whether the turn sequence
@@ -45,5 +48,3 @@ for linux and ubuntu. No lib/dependecy installation required.
 $ python3 game.py <number of players> <number of runs>
 ```
 
-### Author
-Sergii Sichynskyi
