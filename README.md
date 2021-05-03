@@ -4,7 +4,8 @@
 [![Coverage Status](https://coveralls.io/repos/github/ssichynskyi/lotti-karotti-calc/badge.svg?branch=master&service=github)](https://coveralls.io/github/ssichynskyi/lotti-karotti-calc?branch=master)
 
 ## Calculator of winning odds in the game Lotti Karotti
-(!) Don't take this project seriously. It was made just for fun and mostly to try things like python "compilation" and trying on GitHub actions and some other things which I haven't touched for some time.
+(!) Don't take this project seriously :-)
+It was made just for fun and mostly to try things like python "compilation" and trying on GitHub actions and some other things which I haven't touched for some time.
 
 This program calculates the winning odds for a certain player
 in the game [Lotti Karotti](https://de.wikipedia.org/wiki/Lotti_Karotti)
